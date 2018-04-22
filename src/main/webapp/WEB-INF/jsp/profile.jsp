@@ -12,9 +12,11 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded" >
   <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
+    
+    
   </button>
   <a class="navbar-brand" href="#">Stefi</a>
 
@@ -44,8 +46,10 @@
 </div>
 <div class="bio"style="width: 80%" >
 <h1 style="margin-top:5%;;">Akshit Bansal</h1>
-<p	 style="margin-top:6%;">My name is Akshit Bansal and currently a student at University at Albany.
-<br>I love to explore different places and enjoy listening classical rock.</p>
+<img src ="${ImgSrc}" alt="Profile Page Image"/ style="margin-top:10%;margin-left:2%">
+</div>
+<div class="bio"style="width: 20%" >
+
 </div>
 
 </div>

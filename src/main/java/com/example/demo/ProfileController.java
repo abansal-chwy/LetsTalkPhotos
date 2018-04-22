@@ -21,7 +21,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-@Component
 @Controller
 public class ProfileController {
 	
@@ -30,7 +29,7 @@ public class ProfileController {
 	@Value("#{systemEnvironment['AWS_SECRET_ACCESS_KEY']}")
 	String SecretKey;
 	
-	@GetMapping(value="/")
+	@GetMapping(value="")
 	public ModelAndView renderPage() {
 		
 		
@@ -60,7 +59,7 @@ public class ProfileController {
 		
 		String ImgSrc="http://"+"softwareengineeringdemo1"+".s3.amazonaws.com/"+image.getOriginalFilename();
 		ProfilePage.addObject("ImgSrc",ImgSrc);
-		ProfilePage.setViewName("profile");
+		ProfilePage.setViewName("User_Profile");
 		return ProfilePage;
 	}
 	catch(IOException e)

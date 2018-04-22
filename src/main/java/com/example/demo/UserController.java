@@ -60,9 +60,9 @@ public class UserController {
 				
 				userRepo.save(n);
 				
-				if(!(split.length==0)) {
+				if(!(split.length==0) && (!myFriends.equals(""))) {
 				for(int i=0;i<split.length;i++) {
-					
+					System.out.println("1"+myFriends+"1");
 					Friends f=new Friends();
 					f.setUser(myId);
 					f.setFriendid(split[i]);

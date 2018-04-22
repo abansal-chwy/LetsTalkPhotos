@@ -25,7 +25,7 @@
     
     
   </button>
-  <a class="navbar-brand" href="/UserLogin">LetsTalkPhotos</a>
+  <a class="navbar-brand" href="/">LetsTalkPhotos</a>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">

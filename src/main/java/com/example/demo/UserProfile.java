@@ -1,16 +1,12 @@
 package com.example.demo;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
+
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
+
 import javax.validation.constraints.NotNull;
 
 
@@ -28,6 +24,8 @@ public class UserProfile {
 	private String biography;
 	
 	private String image;
+	
+
 
 	public Integer getId() {
 		return Id;
@@ -69,5 +67,6 @@ public class UserProfile {
 	public void setImage(String image) {
 		this.image = image;
 	}
-    
+
+	
 }

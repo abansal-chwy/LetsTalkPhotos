@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import java.util.ArrayList;
+
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +38,7 @@ public class UserController {
 			@RequestParam(name="myEmail") String myEmail,HttpServletRequest req)
 	{
 		req.getSession().setAttribute("myId", myId);
+		req.getSession().setAttribute("myEmail", myEmail);
 		req.getSession().setAttribute("name",myName);
 		req.getSession().setAttribute("friends",myFriends);
 		System.out.println(myId+""+myEmail+""+myName+""+myFriends);
@@ -50,7 +51,7 @@ public class UserController {
 		
 		
 			Optional<User> result = userRepo.findById(myId.toString());
-			if(!result.isPresent()) {
+			if(!(result.isPresent())) {
 				
 				System.out.println("in here");
 				User n = new User();
@@ -62,7 +63,7 @@ public class UserController {
 				
 				if(!(split.length==0) && (!myFriends.equals(""))) {
 				for(int i=0;i<split.length;i++) {
-					System.out.println("1"+myFriends+"1");
+					
 					Friends f=new Friends();
 					f.setUser(myId);
 					f.setFriendid(split[i]);
@@ -79,10 +80,7 @@ public class UserController {
 			
 
 		
-		
-		
-		
-		
+			
 			
 		//save the users
 		//save the relations

@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import java.io.IOException;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,9 @@ import com.example.demo.UserProfile;
 public class UserProfileController {
 
 	@Autowired
+	ServiceClass s;
+	
+	@Autowired
 	private UserProfileRepository userprofile;
 	
 	@Autowired
@@ -47,7 +52,13 @@ public class UserProfileController {
 		String UserID = (String) req.getSession().getAttribute("myId");
 		Optional<UserProfile> result = userprofile.findByUserID(UserID.toString());// optional-since may not be present
 		if (result.isPresent()) {
-			return new ModelAndView("redirect:/RetreiveProfile");
+			String email="akkibansal@gmail.com";
+			if(req.getSession().getAttribute("myEmail").equals(email)) {
+				return new ModelAndView("redirect:/AdminLogin");
+			}
+			else {
+				return new ModelAndView("redirect:/RetreiveProfile");
+			}
 		} else {
 			
 			return new ModelAndView("redirect:/UserProfile");
@@ -59,9 +70,15 @@ public class UserProfileController {
 	
 	
 	@GetMapping(value = "/UserProfile")
-	public ModelAndView ProfilePage() {
+	public ModelAndView ProfilePage(HttpServletRequest req) {
 
 		ModelAndView mv = new ModelAndView();
+		HashMap<String, String> UserPostComments=s.friendCommentOnUserPost(req);
+		HashMap<String, String> postNotificationsComments=s.friendCommentOnHisPost(req);
+		HashMap<String, String> postNotifications=s.friendPost(req);
+		mv.addObject("postNotificationsComments",postNotificationsComments);
+		mv.addObject("UserPostComments",UserPostComments);
+		mv.addObject("notificationPost",postNotifications);
 		mv.setViewName("Create_Profile");
 		return mv;
 	}
@@ -109,15 +126,33 @@ public class UserProfileController {
 	public ModelAndView getUserProfile(HttpServletRequest req) {
 		
 		ModelAndView retrieve = new ModelAndView();
-		
+		String email="akkibansal@gmail.com";
+		if(req.getSession().getAttribute("myEmail").equals(email)) {
+			System.out.println("Email is equal...");
+			return new ModelAndView("redirect:/AdminLogin");
+		}
 		
 		String UserID = (String) req.getSession().getAttribute("myId");
 		Optional<UserProfile> result = userprofile.findByUserID(UserID.toString());// optional-since may not be present
 		UserProfile u = result.get();
-		//System.out.println(u.getImage());
+	
 		String ImgSrc="http://"+"softwareengineeringdemo1"+".s3.amazonaws.com/"+u.getImage();
-		retrieve.addObject("ImgSrc",ImgSrc);		
+		req.getSession().setAttribute("ImgSrc", ImgSrc);
+		
+		//HashMap<Integer, String> comments = s.getAllComments(req);
+		HashMap<String, String> UserPostComments=s.friendCommentOnUserPost(req);
+		HashMap<String, String> postNotificationsComments=s.friendCommentOnHisPost(req);
+		HashMap<String, String> postNotifications=s.friendPost(req);
+		//call service class to get all the post
+		
+		List resultUserPost =s.getUserPost(req);
+		retrieve.addObject("ImgSrc",ImgSrc);
 		retrieve.addObject("user", u);
+		retrieve.addObject("posts", resultUserPost);
+		//retrieve.addObject("findcomments", comments);
+		retrieve.addObject("UserPostComments",UserPostComments);
+		retrieve.addObject("notificationPost",postNotifications);
+		retrieve.addObject("postNotificationsComments",postNotificationsComments);
 		retrieve.setViewName("User_Profile");
 		return retrieve;
 
@@ -128,14 +163,96 @@ public class UserProfileController {
 	ModelAndView mv = new ModelAndView();
 	String UserID = (String) req.getSession().getAttribute("myId");
 	List<Friends> friendsresult=friendRepo.findAllByUser(UserID.toString());
-
+	HashMap<String, String> UserPostComments=s.friendCommentOnUserPost(req);
+	HashMap<String, String> postNotificationsComments=s.friendCommentOnHisPost(req);
+	HashMap<String, String> postNotifications=s.friendPost(req);
+	
+	
+	
 	if (!(friendsresult.size()==0)) {
+		mv.addObject("postNotificationsComments",postNotificationsComments);
+		mv.addObject("UserPostComments",UserPostComments);
+		mv.addObject("notificationPost",postNotifications);
+		mv.setViewName("Create_Profile");
 		mv.addObject("friends",friendsresult);
 		mv.setViewName("Friends");
 		return mv;
 	}	
 	else {
-		return new ModelAndView("ViewFriendsError");
+		mv.addObject("postNotificationsComments",postNotificationsComments);
+		mv.addObject("UserPostComments",UserPostComments);
+		mv.addObject("notificationPost",postNotifications);
+		mv.setViewName("Create_Profile");
+		mv.setViewName("ViewFriendsError");
+		return mv;
 	}
 	}
+	
+	@PostMapping(value = "/UpdateProfilePic")
+	public ModelAndView updateUserProfile(@RequestParam("file") MultipartFile image,
+			HttpServletRequest req) {
+		ModelAndView mv= new ModelAndView();
+		BasicAWSCredentials cred = new BasicAWSCredentials(accessKey,SecretKey);
+
+		AmazonS3 s3client=AmazonS3ClientBuilder.standard().withCredentials
+				(new AWSStaticCredentialsProvider(cred))
+				.withRegion(Regions.US_EAST_2) 
+				.build();
+		
+		try {
+			PutObjectRequest putReq = new PutObjectRequest("softwareengineeringdemo1",image.getOriginalFilename(),image.getInputStream(),new ObjectMetadata())
+					
+					.withCannedAcl(CannedAccessControlList.PublicRead);		
+					s3client.putObject(putReq);
+		
+
+					
+					
+					
+					
+		
+		String UserID = (String) req.getSession().getAttribute("myId");
+		Optional<UserProfile> result = userprofile.findByUserID(UserID.toString());// optional-since may not be present
+		UserProfile up = result.get();
+		up.setImage(image.getOriginalFilename());
+		//up.setImage(image.getOriginalFilename());
+		userprofile.save(up);
+		
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			mv.setViewName("error");
+			return mv;
+		}
+
+		return new ModelAndView("redirect:/RetreiveProfile");
+
+	}
+	@PostMapping(value = "/UpdateProfileBio")
+	public ModelAndView updateUserProfile(@RequestParam(name = "bio") String bio,
+		HttpServletRequest req) {
+		ModelAndView mv= new ModelAndView();
+						
+		
+		String UserID = (String) req.getSession().getAttribute("myId");
+		Optional<UserProfile> result = userprofile.findByUserID(UserID.toString());// optional-since may not be present
+		UserProfile up = result.get();
+		up.setBiography(bio);
+		//up.setImage(image.getOriginalFilename());
+		userprofile.save(up);
+		
+
+		return new ModelAndView("redirect:/RetreiveProfile");
+
+	}
+	
+	@GetMapping(value = "/logout")
+	public ModelAndView logout(HttpServletRequest req) {
+		ModelAndView mv = new ModelAndView();
+		req.getSession().invalidate();
+		mv.setViewName("Login_user");
+		return mv;
+	
 }
+	}
